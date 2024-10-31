@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { Card, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useHistory } from "react-router-dom";
 
 export default function SignIn() {
@@ -39,11 +40,17 @@ export default function SignIn() {
 
   return (
     <div className="flex items-center justify-center h-screen">
-      <Card className="w-[350px] h-[350px] p-4">
-        <CardTitle className="mb-4">Sign In</CardTitle>
-        <button onClick={handleLogin} className="px-4 py-2 border rounded">
-          Login with Google
-        </button>
+      <Card className="w-[350px] h-[350px] p-4 flex flex-col items-center justify-center gap-[80px]">
+        <CardTitle className="mb-4 text-6xl">Sign In</CardTitle>
+
+        <Button onClick={handleLogin} className="px-4 py-2 border rounded">
+          <img
+            src="https://th.bing.com/th/id/R.0fa3fe04edf6c0202970f2088edea9e7?rik=joOK76LOMJlBPw&riu=http%3a%2f%2fpluspng.com%2fimg-png%2fgoogle-logo-png-open-2000.png&ehk=0PJJlqaIxYmJ9eOIp9mYVPA4KwkGo5Zob552JPltDMw%3d&risl=&pid=ImgRaw&r=0"
+            width="20px"
+            alt="google logo"
+          />
+          Login with Google{" "}
+        </Button>
       </Card>
     </div>
   );

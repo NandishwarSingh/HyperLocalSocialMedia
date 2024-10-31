@@ -1,5 +1,6 @@
 import SignIn from "./Pages/SignIn";
 import Feed from "./Pages/Feed";
+import Profile from "./Pages/Profile";
 import { useEffect } from "react";
 import {
   BrowserRouter,
@@ -54,6 +55,9 @@ function AppRoutes() {
       </Route>
       <ProtectedRoute path="/feed">
         <Feed />
+      </ProtectedRoute>
+      <ProtectedRoute path="/profile">
+        <Profile></Profile>
       </ProtectedRoute>
       <ProtectedRoute path="*">
         <Redirect to="/signIn" />
