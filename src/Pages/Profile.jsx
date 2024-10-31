@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { NavLink } from "react-router-dom";
+import { NavLink, useHistory } from "react-router-dom"; // Import useHistory
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
@@ -17,6 +17,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ChevronLeft } from "lucide-react";
+
+const supabase = createClient(
+  "https://bacidsldmsllnflxmbsq.supabase.co",
+  "your-supabase-anon-key" // Replace with your actual Supabase anon key
+);
 
 const EditProfileDialog = () => {
   const [username, setUsername] = useState("Username");
@@ -145,6 +150,7 @@ const PostActionsDialog = ({ caption, onSaveCaption, onDelete }) => {
     </Dialog>
   );
 };
+
 export default function Profile() {
   const [allPosts] = useState([1, 2, 3, 4, 5, 67, 8, 9, 0, 6, 4]);
   const [visiblePosts, setVisiblePosts] = useState([]);
@@ -153,6 +159,20 @@ export default function Profile() {
   const [isLoading, setIsLoading] = useState(false);
   const observer = useRef();
   const POSTS_PER_PAGE = 6;
+  const history = useHistory(); // Initialize useHistory
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        history.push("/signIn"); // Redirect to signIn if not signed in
+      }
+    };
+
+    checkUser();
+  }, [history]);
 
   const lastPostElementRef = useCallback(
     (node) => {
@@ -258,18 +278,18 @@ export default function Profile() {
               </Card>
             );
 
-            if (visiblePosts.length === index + 1 && hasMore) {
+            if (index === visiblePosts.length - 1) {
               return (
-                <div key={index} ref={lastPostElementRef}>
+                <div ref={lastPostElementRef} key={post}>
                   {postContent}
                 </div>
               );
             } else {
-              return <div key={index}>{postContent}</div>;
+              return <div key={post}>{postContent}</div>;
             }
           })}
         </div>
-        {isLoading && <div className="text-center">Loading...</div>}
+        {isLoading && <div>Loading more posts...</div>}
       </div>
     </div>
   );

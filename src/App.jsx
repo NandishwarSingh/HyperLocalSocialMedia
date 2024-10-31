@@ -53,12 +53,13 @@ function AppRoutes() {
       <Route path="/signIn">
         <SignIn />
       </Route>
+      <ProtectedRoute path="/profile">
+        <Profile />
+      </ProtectedRoute>
       <ProtectedRoute path="/feed">
         <Feed />
       </ProtectedRoute>
-      <ProtectedRoute path="/profile">
-        <Profile></Profile>
-      </ProtectedRoute>
+
       <ProtectedRoute path="*">
         <Redirect to="/signIn" />
       </ProtectedRoute>
