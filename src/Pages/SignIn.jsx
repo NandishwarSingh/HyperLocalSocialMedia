@@ -14,11 +14,59 @@ export default function SignIn() {
 
   useEffect(() => {
     const checkUser = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (session) {
-        history.push("/feed");
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (session) {
+          // Check if user already exists in the users table
+          const { data: existingUser, error: fetchError } = await supabase
+            .from("users")
+            .select("*")
+            .eq("id", session.user.id)
+            .single();
+
+          if (fetchError && fetchError.code !== "PGRST116") {
+            // PGRST116 is "not found" error
+            throw fetchError;
+          }
+
+          if (!existingUser) {
+            // Create new user profile if it doesn't exist
+            const { error: createError } = await supabase.from("users").insert([
+              {
+                id: session.user.id,
+                username:
+                  session.user.user_metadata.username ||
+                  `user_${session.user.id.slice(0, 8)}`,
+                avatar_url: session.user.user_metadata.avatar_url || null,
+                bio: null,
+              },
+            ]);
+
+            if (createError) {
+              if (createError.code === "23505") {
+                // Unique constraint violation
+                setError(
+                  "Username already exists. Please try a different one."
+                );
+                return;
+              }
+              throw createError;
+            }
+          }
+
+          // Only redirect after successful user creation or if user already exists
+          history.push("/feed");
+        }
+      } catch (error) {
+        console.error("Error in checkUser:", error);
+        setError(
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred"
+        );
       }
     };
 
@@ -29,7 +77,7 @@ export default function SignIn() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/feed`,
+        redirectTo: `${window.location.origin}/signIn`,
       },
     });
 
